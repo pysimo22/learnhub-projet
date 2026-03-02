@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>LearnHub — Catalogue</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Arial; background: #f5f5f5; }
+        header { background: #2c3e50; color: white; padding: 20px 40px; }
+        header h1 { font-size: 1.8em; }
+        nav a { color: #aaa; text-decoration: none; margin-left: 20px; }
+        nav a:hover { color: white; }
+        .container { max-width: 1200px; margin: 30px auto; padding: 0 20px; }
+        .stats { display: flex; gap: 15px; margin-bottom: 30px; }
+        .stat { background: white; padding: 15px 25px; border-radius: 8px; text-align: center; box-shadow: 0 2px 5px rgba(0,0,0,0.1); flex: 1; }
+        .stat h2 { color: #3498db; font-size: 2em; }
+        .stat p { color: #666; font-size: 0.9em; }
+        .filters { background: white; padding: 20px; border-radius: 8px; margin-bottom: 20px; display: flex; gap: 10px; flex-wrap: wrap; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .filters select, .filters input { padding: 10px; border: 1px solid #ddd; border-radius: 5px; font-size: 0.95em; }
+        .filters button { padding: 10px 20px; background: #3498db; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 0.95em; }
+        .filters button:hover { background: #2980b9; }
+        .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+        .card { background: white; border-radius: 8px; padding: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); cursor: pointer; transition: transform 0.2s; }
+        .card:hover { transform: translateY(-3px); }
+        .card .category { background: #3498db; color: white; padding: 3px 10px; border-radius: 20px; font-size: 0.8em; display: inline-block; margin-bottom: 10px; }
+        .card h3 { color: #2c3e50; margin-bottom: 8px; }
+        .card p { color: #666; font-size: 0.9em; margin-bottom: 10px; }
+        .card .price { color: #27ae60; font-weight: bold; font-size: 1.2em; }
+        .card .meta { display: flex; justify-content: space-between; margin-top: 10px; color: #888; font-size: 0.85em; }
+        .loading { text-align: center; padding: 40px; color: #888; }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>🎓 LearnHub</h1>
+        <nav>
+            <a href="index.html">Catalogue</a>
+            <a href="dashboard.html">Dashboard</a>
+            <a href="enrollment.html">S'inscrire</a>
+        </nav>
+    </header>
+
+    <div class="container">
+        <!-- Stats -->
+        <div class="stats" id="stats">
+            <div class="loading">Chargement des statistiques...</div>
+        </div>
+
+        <!-- Filtres -->
+        <div class="filters">
+            <select id="category">
+                <option value="">Toutes catégories</option>
+                <option value="Web">Web</option>
+                <option value="Database">Database</option>
+                <option value="Mobile">Mobile</option>
+                <option value="DevOps">DevOps</option>
+                <option value="AI">AI</option>
+            </select>
+            <select id="sort">
+                <option value="price">Prix croissant</option>
+                <option value="-rating">Mieux notés</option>
+                <option value="-popular">Plus populaires</option>
+            </select>
+            <input type="number" id="minPrice" placeholder="Prix min €" style="width:120px">
+            <input type="number" id="maxPrice" placeholder="Prix max €" style="width:120px">
+            <input type="text" id="search" placeholder="Rechercher...">
+            <button onclick="loadCourses()">🔍 Filtrer</button>
+        </div>
+
+        <!-- Cours -->
+        <div class="grid" id="courses">
+            <div class="loading">Chargement des cours...</div>
+        </div>
+    </div>
+
+    <script>
+        const API = 'http://localhost:3000/api';
+
+        async function loadStats() {
+            try {
+                const res  = await fetch(`${API}/stats`);
+                const data = await res.json();
+                document.getElementById('stats').innerHTML = `
+                    <div class="stat"><h2>${data.totalUsers}</h2><p>Utilisateurs</p></div>
+                    <div class="stat"><h2>${data.totalCourses}</h2><p>Cours</p></div>
+                    <div class="stat"><h2>${data.totalLessons}</h2><p>Leçons</p></div>
+                    <div class="stat"><h2>${data.totalEnrollments}</h2><p>Inscriptions</p></div>
+                    <div class="stat"><h2>${data.totalReviews}</h2><p>Avis</p></div>
+                `;
+            } catch(e) {
+                document.getElementById('stats').innerHTML = '<p style="color:red">API non démarrée</p>';
+            }
+        }
+
+        async function loadCourses() {
+            const category = document.getElementById('category').value;
+            const sort     = document.getElementById('sort').value;
+            const search   = document.getElementById('search').value;
+            const minPrice = document.getElementById('minPrice').value;
+            const maxPrice = document.getElementById('maxPrice').value;
+
+            document.getElementById('courses').innerHTML = '<div class="loading">Chargement...</div>';
+
+            try {
+                let url = `${API}/courses?sort=${sort}&published=true`;
+                if (category) url += `&category=${category}`;
+                if (minPrice) url += `&minPrice=${minPrice}`;
+                if (maxPrice) url += `&maxPrice=${maxPrice}`;
+                if (search)   url  = `${API}/courses/search?q=${search}`;
+
+                const res    = await fetch(url);
+                const data   = await res.json();
+                const courses = data.data || [];
+
+                if (courses.length === 0) {
+                    document.getElementById('courses').innerHTML = '<p>Aucun cours trouvé.</p>';
+                    return;
+                }
+
+                document.getElementById('courses').innerHTML = courses.map(c => `
+                    <div class="card" onclick="window.location='course.html?id=${c._id}'">
+                        <span class="category">${c.category}</span>
+                        <h3>${c.title}</h3>
+                        <p>${(c.description || '').substring(0, 80)}...</p>
+                        <p class="price">${c.price} €</p>
+                        <div class="meta">
+                            <span>⭐ ${c.rating?.average || 0}</span>
+                            <span>👥 ${c.enrollmentCount || 0} inscrits</span>
+                            <span>📚 ${c.metadata?.totalLessons || 0} leçons</span>
+                        </div>
+                    </div>
+                `).join('');
+            } catch(e) {
+                document.getElementById('courses').innerHTML = '<p style="color:red">Erreur de connexion à l\'API</p>';
+            }
+        }
+
+        loadStats();
+        loadCourses();
+    </script>
+</body>
+</html>

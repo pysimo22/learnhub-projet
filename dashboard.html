@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>LearnHub — Dashboard</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Arial; background: #f5f5f5; }
+        header { background: #2c3e50; color: white; padding: 20px 40px; }
+        header h1 { font-size: 1.8em; }
+        nav a { color: #aaa; text-decoration: none; margin-left: 20px; }
+        nav a:hover { color: white; }
+        .container { max-width: 900px; margin: 30px auto; padding: 0 20px; }
+        .search-bar { background: white; padding: 20px; border-radius: 8px; margin-bottom: 20px; display: flex; gap: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .search-bar input { flex: 1; padding: 10px; border: 1px solid #ddd; border-radius: 5px; }
+        .search-bar button { padding: 10px 20px; background: #3498db; color: white; border: none; border-radius: 5px; cursor: pointer; }
+        .user-card { background: white; padding: 20px; border-radius: 8px; margin-bottom: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .user-card h2 { color: #2c3e50; }
+        .user-card p { color: #666; margin-top: 5px; }
+        .section { background: white; padding: 20px; border-radius: 8px; margin-bottom: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .section h3 { color: #2c3e50; margin-bottom: 15px; }
+        .enrollment { padding: 15px; border-bottom: 1px solid #eee; }
+        .enrollment:last-child { border-bottom: none; }
+        .progress-bar { background: #eee; border-radius: 10px; height: 10px; margin-top: 5px; }
+        .progress-fill { background: #3498db; border-radius: 10px; height: 10px; }
+        .review { padding: 15px; border-bottom: 1px solid #eee; }
+        .review:last-child { border-bottom: none; }
+        .stars { color: #f1c40f; }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>🎓 LearnHub</h1>
+        <nav>
+            <a href="index.html">Catalogue</a>
+            <a href="dashboard.html">Dashboard</a>
+            <a href="enrollment.html">S'inscrire</a>
+        </nav>
+    </header>
+
+    <div class="container">
+        <div class="search-bar">
+            <input type="text" id="userId" placeholder="Entrez un User ID...">
+            <button onclick="loadDashboard()">Voir Dashboard</button>
+        </div>
+        <div id="dashboard"></div>
+    </div>
+
+    <script>
+        const API = 'http://localhost:3000/api';
+
+        async function loadDashboard() {
+            const id = document.getElementById('userId').value.trim();
+            if (!id) { alert('Entrez un User ID'); return; }
+            try {
+                const res  = await fetch(`${API}/users/${id}/dashboard`);
+                const data = await res.json();
+                if (data.error) { document.getElementById('dashboard').innerHTML = `<p style="color:red">${data.error}</p>`; return; }
+
+                const { user, enrollments, reviews } = data;
+                document.getElementById('dashboard').innerHTML = `
+                    <div class="user-card">
+                        <h2>👤 ${user.firstName} ${user.lastName}</h2>
+                        <p>${user.profile?.bio || ''}</p>
+                        <p style="margin-top:10px">📚 ${user.totalCoursesEnrolled} cours inscrits</p>
+                    </div>
+
+                    <div class="section">
+                        <h3>📖 Inscriptions actives (${enrollments.length})</h3>
+                        ${enrollments.length === 0 ? '<p>Aucune inscription active</p>' :
+                        enrollments.map(e => `
+                            <div class="enrollment">
+                                <p><strong>Cours ID :</strong> ${e.courseId}</p>
+                                <p>Progression : ${e.progress?.percentage || 0}%</p>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width:${e.progress?.percentage || 0}%"></div>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+
+                    <div class="section">
+                        <h3>⭐ Avis laissés (${reviews.length})</h3>
+                        ${reviews.length === 0 ? '<p>Aucun avis</p>' :
+                        reviews.map(r => `
+                            <div class="review">
+                                <p class="stars">${'⭐'.repeat(r.rating)}</p>
+                                <p><strong>${r.title}</strong></p>
+                                <p style="color:#666">${r.comment}</p>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+            } catch(e) {
+                document.getElementById('dashboard').innerHTML = '<p style="color:red">Erreur de connexion à l\'API</p>';
+            }
+        }
+    </script>
+</body>
+</html>

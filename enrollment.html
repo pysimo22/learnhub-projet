@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>LearnHub — Inscription</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Arial; background: #f5f5f5; }
+        header { background: #2c3e50; color: white; padding: 20px 40px; }
+        header h1 { font-size: 1.8em; }
+        nav a { color: #aaa; text-decoration: none; margin-left: 20px; }
+        nav a:hover { color: white; }
+        .container { max-width: 700px; margin: 30px auto; padding: 0 20px; }
+        .form-card { background: white; padding: 30px; border-radius: 8px; margin-bottom: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .form-card h2 { color: #2c3e50; margin-bottom: 20px; }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; color: #555; margin-bottom: 5px; font-weight: bold; }
+        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; font-size: 0.95em; }
+        .btn { padding: 12px 25px; background: #3498db; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 1em; width: 100%; margin-top: 10px; }
+        .btn:hover { background: #2980b9; }
+        .message { padding: 15px; border-radius: 5px; margin-top: 15px; display: none; }
+        .success { background: #d4edda; color: #155724; }
+        .error   { background: #f8d7da; color: #721c24; }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>🎓 LearnHub</h1>
+        <nav>
+            <a href="index.html">Catalogue</a>
+            <a href="dashboard.html">Dashboard</a>
+            <a href="enrollment.html">S'inscrire</a>
+        </nav>
+    </header>
+
+    <div class="container">
+
+        <!-- Formulaire inscription -->
+        <div class="form-card">
+            <h2>📚 S'inscrire à un cours</h2>
+            <div class="form-group">
+                <label>User ID</label>
+                <input type="text" id="enroll-userId" placeholder="ID de l'utilisateur">
+            </div>
+            <div class="form-group">
+                <label>Course ID</label>
+                <input type="text" id="enroll-courseId" placeholder="ID du cours">
+            </div>
+            <div class="form-group">
+                <label>Méthode de paiement</label>
+                <select id="enroll-method">
+                    <option value="card">Carte bancaire</option>
+                    <option value="paypal">PayPal</option>
+                </select>
+            </div>
+            <button class="btn" onclick="enroll()">✅ S'inscrire</button>
+            <div class="message" id="enroll-msg"></div>
+        </div>
+
+        <!-- Formulaire avis -->
+        <div class="form-card">
+            <h2>⭐ Laisser un avis</h2>
+            <div class="form-group">
+                <label>User ID</label>
+                <input type="text" id="review-userId" placeholder="ID de l'utilisateur">
+            </div>
+            <div class="form-group">
+                <label>Course ID</label>
+                <input type="text" id="review-courseId" placeholder="ID du cours">
+            </div>
+            <div class="form-group">
+                <label>Note</label>
+                <select id="review-rating">
+                    <option value="5">⭐⭐⭐⭐⭐ Excellent</option>
+                    <option value="4">⭐⭐⭐⭐ Bien</option>
+                    <option value="3">⭐⭐⭐ Moyen</option>
+                    <option value="2">⭐⭐ Mauvais</option>
+                    <option value="1">⭐ Très mauvais</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Titre</label>
+                <input type="text" id="review-title" placeholder="Titre de votre avis">
+            </div>
+            <div class="form-group">
+                <label>Commentaire</label>
+                <textarea id="review-comment" rows="4" placeholder="Votre commentaire..."></textarea>
+            </div>
+            <button class="btn" onclick="submitReview()">📝 Soumettre l'avis</button>
+            <div class="message" id="review-msg"></div>
+        </div>
+
+    </div>
+
+    <script>
+        const API = 'http://localhost:3000/api';
+
+        async function enroll() {
+            const userId   = document.getElementById('enroll-userId').value.trim();
+            const courseId = document.getElementById('enroll-courseId').value.trim();
+            const method   = document.getElementById('enroll-method').value;
+            const msg      = document.getElementById('enroll-msg');
+
+            try {
+                const res  = await fetch(`${API}/enrollments`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ userId, courseId, method })
+                });
+                const data = await res.json();
+                msg.style.display = 'block';
+                if (res.ok) {
+                    msg.className = 'message success';
+                    msg.textContent = '✅ ' + data.message;
+                } else {
+                    msg.className = 'message error';
+                    msg.textContent = '❌ ' + data.error;
+                }
+            } catch(e) {
+                msg.style.display = 'block';
+                msg.className = 'message error';
+                msg.textContent = '❌ Erreur de connexion à l\'API';
+            }
+        }
+
+        async function submitReview() {
+            const userId   = document.getElementById('review-userId').value.trim();
+            const courseId = document.getElementById('review-courseId').value.trim();
+            const rating   = parseInt(document.getElementById('review-rating').value);
+            const title    = document.getElementById('review-title').value.trim();
+            const comment  = document.getElementById('review-comment').value.trim();
+            const msg      = document.getElementById('review-msg');
+
+            try {
+                const res  = await fetch(`${API}/reviews`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ userId, courseId, rating, title, comment })
+                });
+                const data = await res.json();
+                msg.style.display = 'block';
+                if (res.ok) {
+                    msg.className = 'message success';
+                    msg.textContent = `✅ ${data.message} — Nouvelle moyenne : ${data.newAverage}`;
+                } else {
+                    msg.className = 'message error';
+                    msg.textContent = '❌ ' + data.error;
+                }
+            } catch(e) {
+                msg.style.display = 'block';
+                msg.className = 'message error';
+                msg.textContent = '❌ Erreur de connexion à l\'API';
+            }
+        }
+    </script>
+</body>
+</html>
