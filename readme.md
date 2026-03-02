@@ -1,4 +1,4 @@
-# 📚 LearnHub — Plateforme de Gestion de Cours en Ligne
+# 📚 LearnHub — Base de données MongoDB & API REST pour une Plateforme d'Apprentissage en Ligne
 
 > Base de données MongoDB + API REST Python Flask + Interface HTML
 
@@ -62,7 +62,7 @@ La base de données **learnhub** contient 5 collections :
 ### 1. Cloner le projet
 
 ```bash
-git clone https://github.com/ton-username/learnhub-projet.git
+git clone https://github.com/pysimo22/learnhub-projet.git
 cd learnhub-projet
 ```
 
