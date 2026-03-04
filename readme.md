@@ -1,125 +1,220 @@
-# 📚 LearnHub — Base de données MongoDB & API REST pour une Plateforme d'Apprentissage en Ligne
+# 📚 LearnHub — MongoDB Database & REST API for an E-Learning Platform
 
-> Base de données MongoDB + API REST Python Flask + Interface HTML
+LearnHub est une **plateforme d'apprentissage en ligne** permettant la gestion de cours, d’utilisateurs et d’inscriptions.
+
+Ce projet démontre la **modélisation et la manipulation d’une base de données MongoDB**, l’exposition des données via une **API REST développée avec Flask**, ainsi qu’une **interface web simple en HTML/CSS/JavaScript**.
 
 ---
 
-## 🛠️ Technologies utilisées
+# 🧰 Technologies utilisées
 
 | Technologie | Rôle |
 |-------------|------|
-| **MongoDB** | Base de données NoSQL |
-| **Python Flask** | API REST backend |
-| **PyMongo** | Driver MongoDB pour Python |
-| **Flask-CORS** | Gestion des requêtes cross-origin |
-| **HTML / CSS / JavaScript** | Interface frontend (Vanilla JS) |
-| **Postman** | Test des endpoints API |
+| MongoDB | Base de données NoSQL |
+| Python Flask | Développement de l'API REST |
+| PyMongo | Communication entre Python et MongoDB |
+| HTML / CSS / JavaScript | Interface utilisateur |
+| Postman | Test des endpoints API |
 
 ---
 
-## 📁 Structure du projet
+# 🏗 Architecture du projet
+
+Le projet suit une architecture simple en **3 couches** :
+
+```
+Frontend (HTML / JS)
+        ↓
+API REST Flask
+        ↓
+MongoDB Database
+```
+
+---
+
+# 📁 Structure du projet
 
 ```
 learnhub-projet/
 │
-├── seed.mongosh.js               # Insertion des données initiales
-├── queries.mongosh.js            # Requêtes MongoDB
-├── server.py                     # API REST Flask
-├── requirements.txt              # Dépendances Python
-├── .env                          # Variables d'environnement
+├── seed.mongosh.js
+│   Script d’initialisation de la base MongoDB
 │
-├── index.html                    # Catalogue des cours
-├── course.html                   # Détail d'un cours
-├── dashboard.html                # Dashboard utilisateur
-├── enrollment.html               # Formulaire d'inscription
+├── queries.mongosh.js
+│   Ensemble de requêtes MongoDB (CRUD + requêtes métier)
 │
-└── My Collection.postman_collection.json   # Collection Postman
+├── server.py
+│   API REST développée avec Flask
+│
+├── requirements.txt
+│   Dépendances Python
+│
+├── .env.example
+│   Exemple de configuration des variables d’environnement
+│
+├── index.html
+│   Catalogue des cours
+│
+├── course.html
+│   Page détail d’un cours
+│
+├── dashboard.html
+│   Dashboard utilisateur
+│
+├── enrollment.html
+│   Formulaire d'inscription
+│
+└── My Collection.postman_collection.json
+    Collection Postman pour tester l’API
 ```
 
 ---
 
-## 🗄️ Base de données
+# 🗄 Modélisation de la base de données
 
-La base de données **learnhub** contient 5 collections :
+La base **learnhub** est composée de **5 collections principales** :
 
 | Collection | Documents | Description |
 |------------|-----------|-------------|
-| `users` | 20 | Étudiants et instructeurs |
-| `courses` | 15 | Cours avec catégorie, prix et difficulté |
-| `lessons` | 30 | Leçons rattachées aux cours |
-| `enrollments` | 25 | Inscriptions des étudiants |
-| `reviews` | 20 | Avis et notations |
+| users | 20 | Étudiants et instructeurs |
+| courses | 15 | Cours avec catégorie, difficulté et prix |
+| lessons | 30 | Leçons associées aux cours |
+| enrollments | 25 | Inscriptions des étudiants |
+| reviews | 20 | Avis et notes des cours |
 
 ---
 
-## 🚀 Installation et démarrage
+# 🚀 Installation et exécution
 
-### Prérequis
+## Prérequis
+
 - Python 3.x
-- MongoDB (en cours d'exécution sur le port 27017)
+- MongoDB installé et en cours d'exécution
 - pip
+- mongosh
 
-### 1. Cloner le projet
+---
+
+## 1️⃣ Cloner le projet
 
 ```bash
 git clone https://github.com/pysimo22/learnhub-projet
 cd learnhub-projet
 ```
 
-### 2. Installer les dépendances Python
+---
+
+## 2️⃣ Installer les dépendances
 
 ```bash
 pip install -r requirements.txt
 ```
 
-### 3. Configurer les variables d'environnement
+---
 
-Créer un fichier `.env` à la racine :
+## 3️⃣ Configurer les variables d’environnement
 
-```env
+Créer un fichier `.env` à la racine du projet :
+
+```
 MONGO_URI=mongodb://localhost:27017
 PORT=3000
 ```
 
-### 4. Insérer les données initiales
+---
+
+## 4️⃣ Initialiser la base de données
 
 ```bash
 mongosh < seed.mongosh.js
 ```
 
-### 5. Démarrer le serveur
+Ce script crée la base **learnhub** et insère les données initiales.
+
+---
+
+## 5️⃣ Lancer l’API
 
 ```bash
 python server.py
 ```
 
-Le serveur démarre sur **http://localhost:3000**
+Le serveur sera accessible sur :
 
-### 6. Ouvrir le frontend
-
-Ouvrir `index.html` directement dans le navigateur.
+```
+http://localhost:3000
+```
 
 ---
 
-## 📡 Endpoints API
+## 6️⃣ Ouvrir l’interface web
+
+Ouvrir simplement :
+
+```
+index.html
+```
+
+dans votre navigateur.
+
+---
+
+# 📡 Endpoints principaux de l’API
 
 | Méthode | Endpoint | Description |
-|---------|----------|-------------|
-| `GET` | `/api/courses` | Liste des cours (filtres + pagination) |
-| `GET` | `/api/courses/search?q=` | Recherche textuelle |
-| `POST` | `/api/courses/bulk` | Insérer plusieurs cours |
-| `DELETE` | `/api/courses/:id` | Supprimer un cours |
-| `GET` | `/api/users/:id` | Récupérer un utilisateur |
-| `POST` | `/api/users` | Créer un utilisateur |
-| `PATCH` | `/api/users/:id` | Mettre à jour un utilisateur |
-| `GET` | `/api/users/:id/dashboard` | Dashboard utilisateur |
-| `POST` | `/api/enrollments` | S'inscrire à un cours |
-| `POST` | `/api/reviews` | Soumettre un avis |
-| `GET` | `/api/stats` | Statistiques de la plateforme |
-| `GET` | `/api/export` | Export JSON complet |
+|--------|----------|-------------|
+| GET | /api/courses | Liste des cours (filtrage + pagination) |
+| GET | /api/courses/search?q= | Recherche de cours |
+| POST | /api/courses/bulk | Ajout de plusieurs cours |
+| DELETE | /api/courses/:id | Suppression d’un cours |
+| POST | /api/users | Création d’un utilisateur |
+| GET | /api/users/:id | Récupération d’un utilisateur |
+| PATCH | /api/users/:id | Mise à jour d’un utilisateur |
+| GET | /api/users/:id/dashboard | Dashboard utilisateur |
+| POST | /api/enrollments | Inscription à un cours |
+| POST | /api/reviews | Ajout d’un avis |
+| GET | /api/stats | Statistiques globales |
+| GET | /api/export | Export JSON de la base |
 
 ---
 
-## 👤 Auteur
+# 🧪 Tests API
 
-**Simo** — 2025–2026
+Les endpoints peuvent être testés avec :
+
+- Postman
+- curl
+- le frontend HTML fourni
+
+Une collection Postman est incluse dans le projet.
+
+---
+
+# 📄 Rapport
+
+Le rapport du projet est disponible dans le repository :
+
+```
+rapport-projet.docx
+```
+
+Il décrit :
+
+- la modélisation de la base
+- les requêtes MongoDB
+- l’implémentation de l’API
+- la logique métier
+- les fonctionnalités bonus
+
+---
+
+# 👨‍💻 Auteur
+
+Mohamed Touzani  
+B3 Cybersécurité — 2025 / 2026
+
+---
+
+# ⭐ Projet académique
+
+Ce projet a été réalisé dans le cadre d’un exercice de **conception et manipulation d’une base de données MongoDB pour une plateforme d’apprentissage en ligne**.
