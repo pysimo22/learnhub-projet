@@ -62,7 +62,7 @@ La base de données **learnhub** contient 5 collections :
 ### 1. Cloner le projet
 
 ```bash
-git clone https://github.com/pysimo22/learnhub-projet.git
+git clone https://github.com/pysimo22/learnhub-projet
 cd learnhub-projet
 ```
 
