@@ -42,9 +42,6 @@ def valid_id(id_str):
     except (InvalidId, Exception):
         return None
 
-# ══════════════════════════════════════════════════════════════
-# USERS
-# ══════════════════════════════════════════════════════════════
 
 # ── POST /api/users ── insertOne ──────────────────────────────
 @app.route("/api/users", methods=["POST"])

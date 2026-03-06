@@ -34,6 +34,8 @@ db.users.insertMany([
 
 print("✅ Users : " + db.users.countDocuments());
 
+//les instructeurs
+
 const bob    = db.users.findOne({ email: "bob.dupont@email.com"      });
 const david  = db.users.findOne({ email: "david.morel@email.com"     });
 const hugo   = db.users.findOne({ email: "hugo.simon@email.com"      });
