@@ -1,8 +1,7 @@
 use("learnhub");
 
-// ══════════════════════════════════════════════
 // 2.1 — CRUD
-// ══════════════════════════════════════════════
+
 
 // 1. Insérer un nouvel utilisateur étudiant
 db.users.insertOne({
